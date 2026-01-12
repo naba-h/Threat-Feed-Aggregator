@@ -1,151 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <title>ThreatScope — Cyber Threat Intelligence</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
+* { box-sizing:border-box; }
 body {
   margin:0;
-  font-family: 'Segoe UI', system-ui;
-  background: radial-gradient(circle at top, #0b1f2a, #02060b);
-  color:#d9f7ff;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
+  font-family:Inter,system-ui;
+  background:radial-gradient(circle at top,#0f172a,#020617);
+  color:#e5f3ff;
 }
-
 .app {
-  background:#071a26;
-  width:820px;
-  max-width:95%;
-  padding:30px;
-  border-radius:16px;
-  box-shadow:0 0 60px rgba(0,255,255,.1);
+  max-width:1100px;
+  margin:auto;
+  padding:40px 20px;
 }
-
-h1 {
-  text-align:center;
-  color:#45f3ff;
-  letter-spacing:1px;
-  margin-bottom:20px;
+header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:30px;
 }
-
+header h1 {
+  font-size:32px;
+  color:#22d3ee;
+}
+header span {
+  opacity:.7;
+  font-size:14px;
+}
 .search {
   display:flex;
   gap:12px;
 }
-
 .search input {
   flex:1;
-  padding:14px;
+  padding:16px;
   border-radius:10px;
   border:none;
-  outline:none;
-  background:#04111a;
-  color:#45f3ff;
+  background:#020617;
+  color:white;
   font-size:16px;
+  outline:none;
 }
-
 .search button {
-  padding:14px 24px;
+  padding:16px 28px;
   border:none;
   border-radius:10px;
-  background:#00e0ff;
-  color:#001018;
+  background:#22d3ee;
+  color:black;
   font-weight:700;
   cursor:pointer;
 }
+.search button:hover { background:#67e8f9; }
 
-.search button:hover { background:#00c6e0; }
-
+.status {
+  margin-top:15px;
+  font-size:14px;
+  opacity:.8;
+}
 .grid {
-  margin-top:25px;
+  margin-top:30px;
   display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:18px;
 }
-
 .card {
-  background:#041520;
-  padding:18px;
-  border-radius:12px;
-  border:1px solid #0c2d3f;
+  background:#020617;
+  padding:20px;
+  border-radius:14px;
+  box-shadow:0 0 20px rgba(34,211,238,.12);
 }
-
-.label {
-  font-size:12px;
+.card h3 {
+  margin:0 0 8px 0;
+  font-size:14px;
   opacity:.6;
 }
-
-.value {
-  font-size:22px;
-  margin-top:6px;
-  color:#45f3ff;
+.card p {
+  margin:0;
+  font-size:24px;
+  font-weight:600;
+  color:#22d3ee;
 }
+.risk-low { color:#4ade80; }
+.risk-medium { color:#facc15; }
+.risk-high { color:#f87171; }
 
-.footer {
-  margin-top:20px;
+footer {
+  margin-top:40px;
   text-align:center;
-  font-size:12px;
-  opacity:.5;
-}
-
-.loader {
-  margin-top:15px;
-  text-align:center;
-  color:#45f3ff;
-}
-
-.error {
-  margin-top:15px;
-  color:#ff4d4d;
-  text-align:center;
+  font-size:13px;
+  opacity:.6;
 }
 </style>
 </head>
 
 <body>
-
 <div class="app">
+<header>
   <h1>ThreatScope</h1>
+  <span>Global Cyber Threat Intelligence</span>
+</header>
 
-  <div class="search">
-    <input id="ip" placeholder="Enter IP Address (e.g. 8.8.8.8)">
-    <button onclick="scan()">Scan</button>
-  </div>
+<div class="search">
+  <input id="ip" placeholder="Enter IP address (e.g. 8.8.8.8)" />
+  <button onclick="scan()">Analyze</button>
+</div>
 
-  <div class="loader" id="loader" style="display:none">Scanning intelligence feeds…</div>
-  <div class="error" id="error"></div>
+<div class="status" id="status">Ready.</div>
 
-  <div class="grid">
-    <div class="card"><div class="label">Threat Level</div><div class="value" id="verdict">—</div></div>
-    <div class="card"><div class="label">Threat Score</div><div class="value" id="score">—</div></div>
-    <div class="card"><div class="label">Confidence</div><div class="value" id="confidence">—</div></div>
-    <div class="card"><div class="label">Country</div><div class="value" id="country">—</div></div>
-    <div class="card"><div class="label">ISP</div><div class="value" id="isp">—</div></div>
-    <div class="card"><div class="label">Open Ports</div><div class="value" id="ports">—</div></div>
-  </div>
+<div class="grid">
+  <div class="card"><h3>Threat Level</h3><p id="verdict">—</p></div>
+  <div class="card"><h3>Threat Score</h3><p id="score">—</p></div>
+  <div class="card"><h3>Confidence</h3><p id="confidence">—</p></div>
+  <div class="card"><h3>Country</h3><p id="country">—</p></div>
+  <div class="card"><h3>ISP</h3><p id="isp">—</p></div>
+  <div class="card"><h3>Open Ports</h3><p id="ports">—</p></div>
+</div>
 
-  <div class="footer">
-    Powered by Cloudflare Workers • VirusTotal • AbuseIPDB • OTX • Shodan
-  </div>
+<footer>
+Powered by Cloudflare Workers • VirusTotal • AbuseIPDB • AlienVault OTX • Shodan
+</footer>
 </div>
 
 <script>
-const API = "https://threat-feed-aggregator.hanfinaba.workers.dev";
+const API = "https://threat-feed-aggregator.hanfibaba.workers.dev";
 
 async function scan() {
   const ip = document.getElementById("ip").value.trim();
-  const loader = document.getElementById("loader");
-  const error = document.getElementById("error");
+  if(!ip) return;
 
-  error.textContent="";
-  if(!ip) return alert("Enter IP");
-
-  loader.style.display="block";
+  const status = document.getElementById("status");
+  status.innerText = "Scanning threat intelligence feeds…";
 
   try {
     const res = await fetch(`${API}/?ip=${ip}`);
@@ -153,24 +143,24 @@ async function scan() {
 
     if(data.error) throw data;
 
-    document.getElementById("verdict").textContent = data.verdict;
-    document.getElementById("score").textContent = data.threat_score;
-    document.getElementById("confidence").textContent = data.confidence + "%";
+    const verdictEl = document.getElementById("verdict");
+    verdictEl.innerText = data.verdict;
+    verdictEl.className = data.verdict === "High Risk" ? "risk-high" :
+                          data.verdict === "Medium Risk" ? "risk-medium" :
+                          "risk-low";
 
-    document.getElementById("country").textContent =
-      data.sources.abuse?.country || data.sources.vt?.country || "—";
+    document.getElementById("score").innerText = data.threatScore || data.threat_score;
+    document.getElementById("confidence").innerText = data.confidence + "%";
+    document.getElementById("country").innerText =
+      data.sources.virustotal?.country || data.sources.abuseipdb?.country || "Unknown";
+    document.getElementById("isp").innerText = data.sources.shodan?.isp || "Unknown";
+    document.getElementById("ports").innerText = data.sources.shodan?.ports || 0;
 
-    document.getElementById("isp").textContent =
-      data.sources.shodan?.isp || "Unknown";
+    status.innerText = "Analysis completed.";
 
-    document.getElementById("ports").textContent =
-      data.sources.shodan?.ports?.length || 0;
-
-  } catch(e) {
-    error.textContent = "Backend unreachable or API error";
+  } catch (e) {
+    status.innerText = "Backend unreachable or API error.";
   }
-
-  loader.style.display="none";
 }
 </script>
 

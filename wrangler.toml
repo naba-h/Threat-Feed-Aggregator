@@ -1,0 +1,3 @@
+name = "threat-feed-aggregator"
+main = "src/index.js"
+compatibility_date = "2025-01-01"

@@ -1,10 +1,10 @@
 export default {
-  async fetch(request, env) {
+  async fetch(request) {
     const headers = {
       "content-type": "application/json",
       "access-control-allow-origin": "*",
-      "access-control-allow-methods": "GET",
-      "access-control-allow-headers": "*"
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff"
     };
 
     try {
@@ -17,37 +17,31 @@ export default {
         }), { status: 400, headers });
       }
 
-      // Safe demo threat engine (no API keys required)
-      const last = parseInt(ip.split(".").pop());
+      // Fake but realistic scoring engine
+      const last = parseInt(ip.split(".").pop()) || 1;
+      const score = (last * 7) % 100;
 
-      let score = (last * 7) % 100;
-
-      let verdict =
+      let threat =
         score > 70 ? "High Risk" :
         score > 40 ? "Medium Risk" :
         "Low Risk";
 
-      const data = {
-        ip,
-        verdict,
+      const response = {
+        ip: ip,
+        threat_level: threat,
         threat_score: score,
-        confidence: Math.min(100, score + 15),
-        sources: {
-          virustotal: { country: "Unknown", malicious: score > 60 ? 3 : 0 },
-          abuseipdb: { score },
-          shodan: {
-            isp: "Simulated Network",
-            ports: score > 60 ? [22, 3389] : [80, 443]
-          }
-        }
+        confidence: Math.floor(score * 0.9),
+        country: "Global",
+        isp: "Cloudflare Network",
+        open_ports: [80, 443, 22]
       };
 
-      return new Response(JSON.stringify(data, null, 2), { headers });
+      return new Response(JSON.stringify(response), { headers });
 
     } catch (e) {
       return new Response(JSON.stringify({
-        error: "Worker failure",
-        details: e.toString()
+        error: "Backend failure",
+        details: e.message
       }), { status: 500, headers });
     }
   }

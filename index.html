@@ -1,125 +1,146 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>ThreatScope – Cyber Threat Intelligence</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
-body{
-  margin:0;
-  font-family:Orbitron;
-  background:radial-gradient(circle,#001219,#000);
-  color:#00fff7;
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+body {
+    margin: 0;
+    font-family: Orbitron;
+    background: radial-gradient(circle, #001219, #000);
+    color: #00fff7;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-.panel{
-  background:#020b16;
-  border-radius:20px;
-  padding:40px;
-  width:95%;
-  max-width:900px;
-  box-shadow:0 0 60px #00fff744;
+
+.panel {
+    background: #020b16;
+    border-radius: 20px;
+    padding: 40px;
+    width: 95%;
+    max-width: 900px;
+    box-shadow: 0 0 60px #00fff744;
 }
-h1{
-  text-align:center;
-  margin-bottom:10px;
+
+h1 {
+    text-align: center;
+    margin-bottom: 10px;
 }
-.subtitle{
-  text-align:center;
-  color:#77ffff;
-  margin-bottom:30px;
+
+.subtitle {
+    text-align: center;
+    color: #77ffff;
+    margin-bottom: 30px;
 }
-input{
-  width:75%;
-  padding:15px;
-  border-radius:10px;
-  border:none;
-  background:#01111d;
-  color:#00fff7;
-  font-size:16px;
-  outline:none;
+
+input {
+    width: 75%;
+    padding: 15px;
+    border-radius: 10px;
+    border: none;
+    background: #000;
+    color: #00fff7;
+    font-size: 16px;
 }
-button{
-  padding:15px 30px;
-  background:#00fff7;
-  border:none;
-  border-radius:10px;
-  color:#000;
-  font-weight:bold;
-  cursor:pointer;
+
+button {
+    padding: 15px 30px;
+    background: #00fff7;
+    border: none;
+    border-radius: 10px;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
 }
-.grid{
-  margin-top:30px;
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:20px;
+
+.grid {
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
 }
-.card{
-  background:#011627;
-  border-radius:15px;
-  padding:20px;
-  box-shadow:0 0 20px #00fff733;
+
+.card {
+    background: #061624;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 0 25px #00fff733;
+    text-align: center;
 }
-.card span{
-  color:#77ffff;
+
+.card span {
+    font-size: 22px;
+    color: #77ffff;
 }
-.footer{
-  margin-top:30px;
-  text-align:center;
-  font-size:12px;
-  color:#66ffff;
+
+.status {
+    margin-top: 10px;
+    text-align: center;
+    color: #ff8080;
 }
 </style>
 </head>
 
 <body>
 <div class="panel">
-  <h1>ThreatScope</h1>
-  <div class="subtitle">Global Cyber Threat Intelligence Engine</div>
+    <h1>ThreatScope</h1>
+    <div class="subtitle">Global Cyber Threat Intelligence Platform</div>
 
-  <div style="display:flex;gap:10px;">
-    <input id="ip" placeholder="Enter IP e.g. 8.8.8.8">
-    <button onclick="scan()">Analyze</button>
-  </div>
+    <div style="display:flex; gap:10px;">
+        <input id="ip" placeholder="Enter IP e.g. 8.8.8.8">
+        <button onclick="scan()">Analyze</button>
+    </div>
 
-  <div class="grid">
-    <div class="card">Threat Level<br><span id="level">—</span></div>
-    <div class="card">Threat Score<br><span id="score">—</span></div>
-    <div class="card">Confidence<br><span id="confidence">—</span></div>
-    <div class="card">Country<br><span id="country">—</span></div>
-    <div class="card">ISP<br><span id="isp">—</span></div>
-    <div class="card">Open Ports<br><span id="ports">—</span></div>
-  </div>
+    <div id="status" class="status"></div>
 
-  <div class="footer">
-    Powered by Cloudflare Workers • VirusTotal • AbuseIPDB • AlienVault • Shodan
-  </div>
+    <div class="grid">
+        <div class="card">Threat Level<br><span id="threat">—</span></div>
+        <div class="card">Threat Score<br><span id="score">—</span></div>
+        <div class="card">Confidence<br><span id="confidence">—</span></div>
+        <div class="card">Country<br><span id="country">—</span></div>
+        <div class="card">ISP<br><span id="isp">—</span></div>
+        <div class="card">Open Ports<br><span id="ports">—</span></div>
+    </div>
 </div>
 
 <script>
-async function scan(){
-  const ip = document.getElementById("ip").value;
-  if(!ip){ alert("Enter IP address"); return; }
+const API = "https://threat-feed-aggregator.hanfinaba.workers.dev";
 
-  try{
-    const res = await fetch("https://threat-feed-aggregator.hanfinaba.workers.dev/?ip=" + ip);
-    const data = await res.json();
+async function scan() {
+    const ip = document.getElementById("ip").value.trim();
+    if (!ip) {
+        alert("Enter IP address");
+        return;
+    }
 
-    document.getElementById("level").innerText = data.threat_level;
-    document.getElementById("score").innerText = data.threat_score;
-    document.getElementById("confidence").innerText = data.confidence;
-    document.getElementById("country").innerText = data.country;
-    document.getElementById("isp").innerText = data.isp;
-    document.getElementById("ports").innerText = data.open_ports.join(", ");
-  }
-  catch(e){
-    alert("API connection failed");
-  }
+    document.getElementById("status").innerText = "Scanning...";
+
+    try {
+        const res = await fetch(API + "?ip=" + ip);
+        const data = await res.json();
+
+        if (data.error) {
+            document.getElementById("status").innerText = data.error;
+            return;
+        }
+
+        document.getElementById("status").innerText = "Scan complete";
+        document.getElementById("threat").innerText = data.threat_level;
+        document.getElementById("score").innerText = data.threat_score;
+        document.getElementById("confidence").innerText = data.confidence;
+        document.getElementById("country").innerText = data.country;
+        document.getElementById("isp").innerText = data.isp;
+        document.getElementById("ports").innerText = data.open_ports.join(", ");
+
+    } catch (e) {
+        document.getElementById("status").innerText = "API unreachable";
+    }
 }
 </script>
 

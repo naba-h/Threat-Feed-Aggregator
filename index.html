@@ -1,235 +1,78 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ThreatScope – Cyber Threat Intelligence</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
-  <style>
-    :root{
-      --bg:#0b1220; --panel:#0f1a2e; --muted:#7bd7ff; --accent:#00f7ff; --accent-2:#7bffdf;
-      --text:#e6faff; --danger:#ff5f73; --warn:#ffcc66; --ok:#66ffb3; --border:#162443;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background:radial-gradient(1200px 800px at 10% -20%, #0d1b2a 0%, var(--bg) 40%) fixed;color:var(--text)}
-
-    header{position:sticky;top:0;z-index:10;padding:16px 24px;background:linear-gradient(90deg,#0f172a 0%,#0b1220 60%);
-      border-bottom:1px solid var(--border);box-shadow:0 6px 24px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:space-between}
-    .brand{display:flex;align-items:center;gap:12px}
-    .logo{width:36px;height:36px;border-radius:10px;background:conic-gradient(from 180deg,#00f7ff,#7bffdf,#00c6ff,#00f7ff);
-      box-shadow:0 0 24px rgba(0,247,255,.35), inset 0 0 12px rgba(255,255,255,.25)}
-    .title{font-family:'Orbitron',sans-serif;font-size:20px;letter-spacing:.8px}
-    .subtitle{font-size:12px;color:var(--muted)}
-    .container{max-width:1100px;margin:28px auto;padding:0 20px}
-    .panel{background:linear-gradient(180deg,var(--panel),#0c1629);border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.35);padding:20px}
-    .input-row{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center}
-    .input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:#0a1426;color:var(--text);font-size:16px;outline:none}
-    .btn{padding:12px 18px;border:none;border-radius:12px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#00141a;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(0,247,255,.35);transition:transform .08s ease,filter .2s ease}
-    .btn:hover{filter:brightness(1.1)} .btn:active{transform:scale(.98)} .btn-outline{background:transparent;color:var(--accent);border:1px solid var(--accent);box-shadow:none}
-    .toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:12px}
-    .help{font-size:12px;color:var(--muted)}
-    .status-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#0a1426;color:var(--muted);font-size:12px}
-    .dot{width:8px;height:8px;border-radius:50%}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:18px}
-    .card{background:linear-gradient(180deg,#0c172a,#0a1426);border:1px solid var(--border);border-radius:14px;padding:18px}
-    .label{font-size:12px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
-    .value{margin-top:8px;font-size:22px;font-weight:700}
-    .skeleton{height:26px;border-radius:8px;background:linear-gradient(90deg,#0d1b2a 20%,#0f213c 40%,#0d1b2a 60%);background-size:200% 100%;animation:sweep 1.2s infinite linear}
-    @keyframes sweep{0%{background-position:200% 0}100%{background-position:-200% 0}}
-    .footer{margin:28px 0 10px;color:var(--muted);font-size:12px;text-align:center}
-    .toasts{position:fixed;top:76px;right:20px;display:grid;gap:10px;z-index:20}
-    .toast{background:#111b2e;border:1px solid var(--border);border-left:4px solid var(--accent);padding:12px 14px;border-radius:12px;min-width:260px;box-shadow:0 10px 26px rgba(0,0,0,.4);font-size:13px;color:var(--text)}
-    .toast.error{border-left-color:var(--danger)} .toast.warn{border-left-color:var(--warn)} .toast.ok{border-left-color:var(--ok)}
-    .history{margin-top:22px} .history h3{font-family:'Orbitron',sans-serif;font-size:16px;margin:0 0 10px;color:var(--muted)}
-    .history-list{display:flex;flex-wrap:wrap;gap:8px}
-    .chip{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#0a1426;color:var(--text);font-size:12px;cursor:pointer}
-    @media (max-width:720px){.input-row{grid-template-columns:1fr auto}.btn-outline{display:none}}
-  </style>
+<title>ThreatScope | Cyber Threat Intelligence</title>
+<style>
+body {
+  background:#0b0f19;
+  color:white;
+  font-family:Arial;
+  text-align:center;
+}
+input {
+  width:60%;
+  padding:14px;
+  border-radius:8px;
+  border:none;
+  font-size:16px;
+}
+button {
+  padding:14px 20px;
+  border:none;
+  background:#00f7ff;
+  color:black;
+  font-size:16px;
+  border-radius:8px;
+  cursor:pointer;
+}
+.card {
+  background:#131b2f;
+  margin:10px;
+  padding:15px;
+  border-radius:10px;
+  display:inline-block;
+  width:250px;
+}
+.risk-low { color:#00ff9c; }
+.risk-medium { color:#ffcc00; }
+.risk-high { color:#ff4b4b; }
+</style>
 </head>
 <body>
-<header>
-  <div class="brand">
-    <div class="logo" aria-hidden="true"></div>
-    <div>
-      <div class="title">ThreatScope</div>
-      <div class="subtitle">Cyber Threat Intelligence</div>
-    </div>
-  </div>
-  <div class="status-badge" id="status">
-    <span class="dot" id="status-dot" style="background:var(--warn)"></span>
-    <span id="status-text">Idle</span>
-  </div>
-</header>
 
-<main class="container">
-  <section class="panel">
-    <div class="input-row">
-      <input id="ip" class="input" placeholder="Enter IPv4 address (e.g. 8.8.8.8)"/>
-      <button class="btn" onclick="scan()">Scan</button>
-      <button class="btn btn-outline" onclick="copyIP()">Copy IP</button>
-    </div>
-    <div class="toolbar">
-      <div class="help">Tip: Results are cached for 24h. Try scanning a known IP like 8.8.8.8.</div>
-      <div class="help" id="cached-indicator" style="display:none">From cache</div>
-    </div>
+<h1>🛡 ThreatScope</h1>
+<p>Cyber Threat Intelligence Platform</p>
 
-    <div class="grid" id="cards">
-      <div class="card"><div class="label">Threat level</div><div id="threat" class="value">--</div></div>
-      <div class="card"><div class="label">Threat score</div><div id="score" class="value">--</div></div>
-      <div class="card"><div class="label">Abuse score</div><div id="abuse" class="value">--</div></div>
-      <div class="card"><div class="label">Confidence</div><div id="confidence" class="value">--</div></div>
-      <div class="card"><div class="label">Country</div><div id="country" class="value">--</div></div>
-      <div class="card"><div class="label">ISP</div><div id="isp" class="value">--</div></div>
-      <div class="card"><div class="label">Open ports</div><div id="ports" class="value">--</div></div>
-    </div>
+<input id="ip" placeholder="Enter IP address"/>
+<button onclick="scan()">Scan</button>
 
-    <div class="history">
-      <h3>Recent scans</h3>
-      <div class="history-list" id="history"></div>
-    </div>
-  </section>
+<h2 id="verdict"></h2>
 
-  <p class="footer">Powered by Cloudflare Workers • VirusTotal • AbuseIPDB • OTX • Shodan</p>
-</main>
-
-<div class="toasts" id="toasts"></div>
+<div id="cards"></div>
 
 <script>
-  // Update this to your deployed Worker URL
-  const API = "https://threat-feed-aggregator.hanfinaba.workers.dev";
+async function scan(){
+  const ip = document.getElementById("ip").value;
+  const res = await fetch("https://threat-feed-aggregator.hanfinaba.workers.dev/?ip="+ip);
+  const data = await res.json();
 
-  const ipInput = document.getElementById("ip");
-  const cards = {
-    threat: document.getElementById("threat"),
-    score: document.getElementById("score"),
-    abuse: document.getElementById("abuse"),
-    confidence: document.getElementById("confidence"),
-    country: document.getElementById("country"),
-    isp: document.getElementById("isp"),
-    ports: document.getElementById("ports")
-  };
-  const statusDot = document.getElementById("status-dot");
-  const statusText = document.getElementById("status-text");
-  const cachedIndicator = document.getElementById("cached-indicator");
-  const toasts = document.getElementById("toasts");
-  const historyEl = document.getElementById("history");
+  let riskClass = "risk-low";
+  if(data.verdict=="Medium Risk") riskClass="risk-medium";
+  if(data.verdict=="High Risk") riskClass="risk-high";
 
-  const ipv4Regex = /^(25[0-5]|2[0-4]\d|[01]?\d\d?)(\.(25[0-5]|2[0-4]\d|[01]?\d\d?)){3}$/;
+  document.getElementById("verdict").innerHTML =
+    `<span class="${riskClass}">${data.verdict}</span> (Confidence ${data.confidence}%)`;
 
-  function setStatus(text, color){
-    statusText.textContent = text;
-    statusDot.style.background = color;
-  }
-
-  function showToast(message, type="ok"){
-    const t = document.createElement("div");
-    t.className = "toast " + type;
-    t.textContent = message;
-    toasts.appendChild(t);
-    setTimeout(()=> t.remove(), 3500);
-  }
-
-  function setLoading(){
-    Object.values(cards).forEach(el=>{
-      el.innerHTML = "<div class='skeleton'></div>";
-    });
-    cachedIndicator.style.display = "none";
-    setStatus("Scanning", "var(--warn)");
-  }
-
-  function setResult(data){
-    cards.threat.textContent = data.threatLevel || "Low";
-    cards.score.textContent = data.threatScore ?? "0";
-    cards.abuse.textContent = data.abuseScore ?? "0";
-    const conf = (typeof data.confidence === "number") ? `${data.confidence}%` : (data.confidence || "0%");
-    cards.confidence.textContent = conf;
-    cards.country.textContent = data.country || "Unknown";
-    cards.isp.textContent = data.isp || "Unknown";
-    const ports = Array.isArray(data.openPorts) && data.openPorts.length ? data.openPorts.join(", ") : "None";
-    cards.ports.textContent = ports;
-
-    const risk = (data.threatLevel || "Low").toLowerCase();
-    if (risk === "high") setStatus("High risk", "var(--danger)");
-    else if (risk === "medium") setStatus("Medium risk", "var(--warn)");
-    else setStatus("Low risk", "var(--ok)");
-
-    if (data.cached) cachedIndicator.style.display = "inline-block";
-    else cachedIndicator.style.display = "none";
-  }
-
-  function copyIP(){
-    const ip = ipInput.value.trim();
-    if (!ip) return showToast("No IP to copy", "warn");
-    navigator.clipboard.writeText(ip).then(()=>showToast("IP copied to clipboard"));
-  }
-
-  function addHistory(ip){
-    try{
-      const list = JSON.parse(localStorage.getItem("threatscope_history")||"[]");
-      const newList = [ip, ...list.filter(x=>x!==ip)].slice(0,10);
-      localStorage.setItem("threatscope_history", JSON.stringify(newList));
-      renderHistory();
-    }catch{}
-  }
-
-  function renderHistory(){
-    historyEl.innerHTML = "";
-    try{
-      const list = JSON.parse(localStorage.getItem("threatscope_history")||"[]");
-      list.forEach(ip=>{
-        const chip = document.createElement("button");
-        chip.className = "chip";
-        chip.textContent = ip;
-        chip.onclick = ()=>{ ipInput.value = ip; scan(); };
-        historyEl.appendChild(chip);
-      });
-    }catch{}
-  }
-
-  async function scan(){
-    const ip = ipInput.value.trim();
-
-    if (!ip){
-      showToast("Please enter an IP address", "warn");
-      return;
-    }
-    if (!ipv4Regex.test(ip)){
-      showToast("Invalid IPv4 address format", "error");
-      return;
-    }
-
-    setLoading();
-    try{
-      const res = await fetch(`${API}?ip=${encodeURIComponent(ip)}`);
-      if (!res.ok){
-        showToast(`Backend error: ${res.status}`, "error");
-        setStatus("Error", "var(--danger)");
-        return;
-      }
-      const data = await res.json();
-      if (data.error){
-        showToast(data.error, "error");
-        setStatus("Error", "var(--danger)");
-        return;
-      }
-      setResult(data);
-      addHistory(ip);
-      showToast("Scan complete");
-    }catch(err){
-      console.error(err);
-      showToast("Network error while fetching data", "error");
-      setStatus("Error", "var(--danger)");
-    }
-  }
-
-  ipInput.addEventListener("keydown",(e)=>{
-    if (e.key === "Enter") scan();
-  });
-
-  renderHistory();
-  setStatus("Ready", "var(--ok)");
+  document.getElementById("cards").innerHTML = `
+  <div class="card">🌍 Country: ${data.sources.virustotal.country}</div>
+  <div class="card">🏢 ASN: ${data.sources.virustotal.asn}</div>
+  <div class="card">🧪 VirusTotal: ${data.sources.virustotal.malicious}</div>
+  <div class="card">🚨 AbuseIPDB: ${data.sources.abuseipdb.score}</div>
+  <div class="card">🧠 OTX Pulses: ${data.sources.otx.pulses}</div>
+  <div class="card">🔍 Shodan Ports: ${data.sources.shodan.ports}</div>
+  `;
+}
 </script>
+
 </body>
 </html>

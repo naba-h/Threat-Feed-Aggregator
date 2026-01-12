@@ -2,92 +2,65 @@
 <html>
 <head>
 <title>ThreatScope</title>
-<meta charset="UTF-8">
 <style>
 body {
   background:#0b1220;
-  font-family:Arial;
+  font-family: Arial;
   color:white;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
+  text-align:center;
 }
-
-.card {
-  background:#111a2e;
-  padding:30px;
-  border-radius:15px;
-  width:500px;
-  box-shadow:0 0 40px #00f7ff33;
-}
-
-input {
-  width:100%;
+input, button {
   padding:12px;
-  background:#0b1220;
-  border:1px solid #00f7ff;
-  color:white;
-  border-radius:8px;
-}
-
-button {
-  margin-top:15px;
-  width:100%;
-  padding:12px;
-  background:#00f7ff;
+  font-size:16px;
+  border-radius:6px;
   border:none;
-  border-radius:8px;
-  font-weight:bold;
+}
+button {
+  background:#00f7ff;
   cursor:pointer;
 }
-
-.result {
-  margin-top:20px;
-  background:#0b1220;
-  padding:15px;
-  border-radius:10px;
+.box {
+  margin:10px;
+  padding:20px;
+  border:1px solid #00f7ff;
+  border-radius:8px;
+  display:inline-block;
+  width:200px;
 }
 </style>
 </head>
 
 <body>
+<h1>ThreatScope</h1>
 
-<div class="card">
-<h2>ThreatScope</h2>
-
-<input id="ip" placeholder="Enter IP Address (eg 8.8.8.8)">
+<input id="ip" placeholder="Enter IP e.g. 8.8.8.8">
 <button onclick="scan()">Analyze</button>
 
-<div id="output" class="result">Waiting for scan...</div>
-</div>
+<div id="result"></div>
 
 <script>
+const API = "https://threat-feed-aggregator.hanfibaba.workers.dev/?ip=";
+
 async function scan(){
   const ip = document.getElementById("ip").value;
-  const out = document.getElementById("output");
-
-  out.innerText = "Scanning...";
+  document.getElementById("result").innerHTML = "Scanning...";
 
   try {
-    const res = await fetch(
-      "https://threat-feed-aggregator.hanfibaba.workers.dev/?ip=" + ip
-    );
+    const res = await fetch(API + ip);
     const data = await res.json();
 
-    out.innerHTML = `
-      IP: ${data.ip}<br>
-      Threat Level: ${data.threatLevel}<br>
-      Threat Score: ${data.threatScore}<br>
-      Abuse Score: ${data.abuseScore}<br>
-      Open Ports: ${data.openPorts}<br>
-      Confidence: ${data.confidence}%
+    document.getElementById("result").innerHTML = `
+      <div class="box">IP<br>${data.ip}</div>
+      <div class="box">Risk<br>${data.verdict}</div>
+      <div class="box">Score<br>${data.threat_score}</div>
+      <div class="box">Confidence<br>${data.confidence}%</div>
+      <div class="box">Country<br>${data.country}</div>
+      <div class="box">ISP<br>${data.isp}</div>
     `;
-  } catch(e) {
-    out.innerText = "Backend not reachable";
+  } catch(e){
+    document.getElementById("result").innerHTML = "API error";
   }
 }
 </script>
-
 </body>
 </html>

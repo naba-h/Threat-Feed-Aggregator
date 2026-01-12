@@ -1,59 +1,54 @@
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
+    const headers = {
+      "content-type": "application/json",
+      "access-control-allow-origin": "*",
+      "access-control-allow-methods": "GET",
+      "access-control-allow-headers": "*"
+    };
+
     try {
       const url = new URL(request.url);
       const ip = url.searchParams.get("ip");
 
       if (!ip) {
         return new Response(JSON.stringify({
-          error: "Missing IP parameter. Use ?ip=8.8.8.8"
-        }), {
-          status: 400,
-          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
-        });
+          error: "Missing IP. Use ?ip=8.8.8.8"
+        }), { status: 400, headers });
       }
 
-      // Fake intelligence engine (stable, no API crash)
-      const octets = ip.split(".").map(Number);
-      const last = octets[3] || 0;
+      // Safe demo threat engine (no API keys required)
+      const last = parseInt(ip.split(".").pop());
 
       let score = (last * 7) % 100;
 
-      let verdict = "Low Risk";
-      if (score > 70) verdict = "High Risk";
-      else if (score > 40) verdict = "Medium Risk";
+      let verdict =
+        score > 70 ? "High Risk" :
+        score > 40 ? "Medium Risk" :
+        "Low Risk";
 
-      const response = {
+      const data = {
         ip,
-        threat_level: verdict,
+        verdict,
         threat_score: score,
         confidence: Math.min(100, score + 15),
-        country: "Unknown",
-        isp: "Unknown ISP",
-        open_ports: last % 2 === 0 ? [80, 443] : [22, 3389],
         sources: {
-          virustotal: { malicious: score > 70 ? 5 : 0 },
-          abuseipdb: { score: score },
-          alienvault: { pulses: Math.floor(score / 10) },
-          shodan: { ports: last % 2 === 0 ? [80, 443] : [22, 3389] }
+          virustotal: { country: "Unknown", malicious: score > 60 ? 3 : 0 },
+          abuseipdb: { score },
+          shodan: {
+            isp: "Simulated Network",
+            ports: score > 60 ? [22, 3389] : [80, 443]
+          }
         }
       };
 
-      return new Response(JSON.stringify(response, null, 2), {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*"
-        }
-      });
+      return new Response(JSON.stringify(data, null, 2), { headers });
 
-    } catch (err) {
+    } catch (e) {
       return new Response(JSON.stringify({
-        error: "Worker crashed",
-        details: err.message
-      }), {
-        status: 500,
-        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
-      });
+        error: "Worker failure",
+        details: e.toString()
+      }), { status: 500, headers });
     }
   }
 };

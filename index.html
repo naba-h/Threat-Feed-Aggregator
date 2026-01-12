@@ -7,6 +7,7 @@
 
 <link rel="icon" href="https://www.cloudflare.com/favicon.ico">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+
 <style>
 body {
     margin: 0;
@@ -24,20 +25,12 @@ body {
     border-radius: 20px;
     padding: 40px;
     width: 95%;
-    max-width: 900px;
+    max-width: 1000px;
     box-shadow: 0 0 60px #00fff744;
 }
 
-h1 {
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.subtitle {
-    text-align: center;
-    color: #77ffff;
-    margin-bottom: 30px;
-}
+h1 { text-align:center; margin-bottom:10px; }
+.subtitle { text-align:center; color:#77ffff; margin-bottom:30px; }
 
 input {
     width: 75%;
@@ -75,7 +68,7 @@ button {
 }
 
 .card span {
-    font-size: 22px;
+    font-size: 20px;
     color: #77ffff;
 }
 
@@ -104,7 +97,12 @@ button {
         <div class="card">Threat Score<br><span id="score">—</span></div>
         <div class="card">Confidence<br><span id="confidence">—</span></div>
         <div class="card">Country<br><span id="country">—</span></div>
+        <div class="card">City<br><span id="city">—</span></div>
+        <div class="card">Region<br><span id="region">—</span></div>
         <div class="card">ISP<br><span id="isp">—</span></div>
+        <div class="card">ASN<br><span id="asn">—</span></div>
+        <div class="card">Latitude<br><span id="lat">—</span></div>
+        <div class="card">Longitude<br><span id="lon">—</span></div>
         <div class="card">Open Ports<br><span id="ports">—</span></div>
     </div>
 </div>
@@ -122,25 +120,36 @@ async function scan() {
     document.getElementById("status").innerText = "Scanning...";
 
     try {
-      const res = await fetch(API + "?ip=" + ip);
+        const res = await fetch(API + "?ip=" + ip);
 
-if (!res.ok) {
-    document.getElementById("status").innerText = "API error: " + res.status;
-    return;
-}
+        if (!res.ok) {
+            document.getElementById("status").innerText = "API error: " + res.status;
+            return;
+        }
 
-const data = await res.json();
+        const data = await res.json();
 
-if (data.error) {
-    document.getElementById("status").innerText = data.error;
-    return;
-}
+        if (data.error) {
+            document.getElementById("status").innerText = data.error;
+            return;
+        }
+
         document.getElementById("status").innerText = "Scan complete";
+
         document.getElementById("threat").innerText = data.threat_level;
         document.getElementById("score").innerText = data.threat_score;
         document.getElementById("confidence").innerText = data.confidence;
+
         document.getElementById("country").innerText = data.country;
+        document.getElementById("city").innerText = data.city;
+        document.getElementById("region").innerText = data.region;
+
         document.getElementById("isp").innerText = data.isp;
+        document.getElementById("asn").innerText = data.asn;
+
+        document.getElementById("lat").innerText = data.latitude ?? "-";
+        document.getElementById("lon").innerText = data.longitude ?? "-";
+
         document.getElementById("ports").innerText = data.open_ports.join(", ");
 
     } catch (e) {

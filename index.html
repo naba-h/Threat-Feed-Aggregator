@@ -1,48 +1,45 @@
 <script>
-const API = "https://threat-feed-aggregator.hanfinaba.workers.dev";
+const API = "https://threat-feed-aggregator.hanfibaba.workers.dev";
 
 async function scanIP() {
-  const ip = document.getElementById("ipInput").value.trim();
-  if (!ip) {
-    alert("Please enter an IP address");
-    return;
-  }
+  const ip = document.getElementById("ip").value.trim();
+  if (!ip) return alert("Enter IP");
 
-  setLoading(true);
+  setLoading();
 
   try {
     const res = await fetch(`${API}/?ip=${ip}`);
     const data = await res.json();
 
-    if (data.error) {
-      throw new Error(data.error);
-    }
+    if (data.error) throw data.error;
 
-    document.getElementById("abuse").innerText =
-      data.feeds?.abuseipdb?.abuseConfidenceScore ?? "0";
-
-    document.getElementById("country").innerText =
-      data.geo?.country ?? "Unknown";
-
-    document.getElementById("isp").innerText =
-      data.geo?.isp ?? "Unknown";
-
-    document.getElementById("status").innerText = data.risk;
-    document.getElementById("score").innerText = data.threat_score;
-
-    setLoading(false);
+    render(data);
   } catch (e) {
-    alert("Backend unreachable or error");
-    console.error(e);
-    setLoading(false);
+    alert("Backend not reachable");
   }
 }
 
-function setLoading(on) {
-  document.getElementById("status").innerText = on ? "Scanning…" : "--";
-  document.getElementById("abuse").innerText = on ? "…" : "--";
-  document.getElementById("country").innerText = on ? "…" : "--";
-  document.getElementById("isp").innerText = on ? "…" : "--";
-  document.getElementById("score").innerText = on ? "…" : "--";
+function setLoading() {
+  set("threat", "Scanning...");
+  set("score", "--");
+  set("abuse", "--");
+  set("country", "--");
+  set("isp", "--");
+  set("ports", "--");
+  set("confidence", "--");
+}
+
+function set(id, val) {
+  document.getElementById(id).innerText = val;
+}
+
+function render(d) {
+  set("threat", d.risk);
+  set("score", d.threat_score);
+  set("abuse", d.feeds.abuseipdb?.abuseConfidenceScore || 0);
+  set("country", d.geo.country);
+  set("isp", d.geo.isp);
+  set("ports", d.feeds.shodan?.open_ports?.join(", ") || "None");
+  set("confidence", d.confidence);
 }
 </script>

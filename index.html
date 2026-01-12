@@ -1,66 +1,47 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>ThreatScope</title>
-<style>
-body {
-  background:#0b1220;
-  font-family: Arial;
-  color:white;
-  text-align:center;
-}
-input, button {
-  padding:12px;
-  font-size:16px;
-  border-radius:6px;
-  border:none;
-}
-button {
-  background:#00f7ff;
-  cursor:pointer;
-}
-.box {
-  margin:10px;
-  padding:20px;
-  border:1px solid #00f7ff;
-  border-radius:8px;
-  display:inline-block;
-  width:200px;
-}
-</style>
-</head>
-
-<body>
-<h1>ThreatScope</h1>
-
-<input id="ip" placeholder="Enter IP e.g. 8.8.8.8">
-<button onclick="scan()">Analyze</button>
-
-<div id="result"></div>
-
 <script>
-const API = "https://threat-feed-aggregator.hanfibaba.workers.dev/?ip=";
+const API = "https://threat-feed-aggregator.hanfibaba.workers.dev";
 
-async function scan(){
-  const ip = document.getElementById("ip").value;
-  document.getElementById("result").innerHTML = "Scanning...";
+async function analyze() {
+  const ip = document.getElementById("ipInput").value.trim();
+  if (!ip) return alert("Enter IP");
+
+  setLoading();
 
   try {
-    const res = await fetch(API + ip);
-    const data = await res.json();
+    const r = await fetch(`${API}?ip=${ip}`);
+    const data = await r.json();
 
-    document.getElementById("result").innerHTML = `
-      <div class="box">IP<br>${data.ip}</div>
-      <div class="box">Risk<br>${data.verdict}</div>
-      <div class="box">Score<br>${data.threat_score}</div>
-      <div class="box">Confidence<br>${data.confidence}%</div>
-      <div class="box">Country<br>${data.country}</div>
-      <div class="box">ISP<br>${data.isp}</div>
-    `;
-  } catch(e){
-    document.getElementById("result").innerHTML = "API error";
+    if (data.error) throw new Error(data.error);
+
+    document.getElementById("threatLevel").innerText = data.verdict;
+    document.getElementById("threatScore").innerText = data.threat_score;
+    document.getElementById("confidence").innerText = data.confidence + "%";
+
+    document.getElementById("country").innerText =
+      data.sources.virustotal?.country || "Unknown";
+
+    document.getElementById("isp").innerText =
+      data.sources.shodan?.isp || "Unknown";
+
+    document.getElementById("ports").innerText =
+      (data.sources.shodan?.ports || []).join(", ") || "None";
+
+  } catch (e) {
+    document.getElementById("threatLevel").innerText = "Backend unreachable";
+    document.getElementById("threatScore").innerText = "—";
+    document.getElementById("confidence").innerText = "—";
+    document.getElementById("country").innerText = "—";
+    document.getElementById("isp").innerText = "—";
+    document.getElementById("ports").innerText = "—";
   }
 }
+
+function setLoading() {
+  document.getElementById("threatLevel").innerText = "Loading…";
+  document.getElementById("threatScore").innerText = "…";
+  document.getElementById("confidence").innerText = "…";
+  document.getElementById("country").innerText = "…";
+  document.getElementById("isp").innerText = "…";
+  document.getElementById("ports").innerText = "…";
+}
 </script>
-</body>
-</html>

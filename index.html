@@ -3,88 +3,134 @@
 <head>
 <meta charset="UTF-8">
 <title>ThreatScope – Cyber Threat Intelligence</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
 <style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Orbitron',sans-serif}
 body{
-    margin:0;
-    font-family: 'Segoe UI', sans-serif;
-    background:linear-gradient(120deg,#020b17,#05172d);
-    color:#e6f1ff;
-}
-header{
-    text-align:center;
-    padding:30px;
-    font-size:28px;
-    color:#00f6ff;
-    letter-spacing:2px;
+  background: radial-gradient(circle at top,#061a2a,#020b14);
+  color:#00eaff;
+  min-height:100vh;
 }
 .container{
-    max-width:900px;
-    margin:auto;
-    padding:20px;
+  max-width:1000px;
+  margin:auto;
+  padding:40px 20px;
 }
-.search-box{
-    display:flex;
-    gap:10px;
+.header{
+  text-align:center;
+  margin-bottom:40px;
 }
-input{
-    flex:1;
-    padding:14px;
-    border-radius:8px;
-    border:none;
-    outline:none;
-    font-size:16px;
-}
-button{
-    background:#00f6ff;
-    border:none;
-    color:#001;
-    font-weight:bold;
-    padding:14px 22px;
-    border-radius:8px;
-    cursor:pointer;
-}
-button:hover{opacity:.8}
-.cards{
-    margin-top:30px;
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:15px;
+.header h1{
+  font-size:36px;
+  color:#00f5ff;
+  text-shadow:0 0 20px #00f5ff;
 }
 .card{
-    background:#0b1f38;
-    border-radius:12px;
-    padding:20px;
-    box-shadow:0 0 20px rgba(0,255,255,.1);
+  background:rgba(0,15,30,0.9);
+  border:1px solid #00f5ff55;
+  border-radius:15px;
+  padding:30px;
+  box-shadow:0 0 25px #00f5ff33;
 }
-.card h3{
-    color:#00f6ff;
-    margin-bottom:8px;
+.input-row{
+  display:flex;
+  gap:15px;
+  margin-bottom:30px;
 }
+input{
+  flex:1;
+  padding:15px;
+  border-radius:10px;
+  border:none;
+  outline:none;
+  background:#02131f;
+  color:#00f5ff;
+  font-size:16px;
+}
+button{
+  padding:15px 25px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(45deg,#00f5ff,#0066ff);
+  color:black;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 0 15px #00f5ff;
+}
+button:hover{opacity:.9}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+}
+.box{
+  background:#021826;
+  border:1px solid #00f5ff44;
+  border-radius:12px;
+  padding:20px;
+  text-align:center;
+  box-shadow:0 0 10px #00f5ff22;
+}
+.box h3{
+  font-size:14px;
+  color:#8befff;
+  margin-bottom:10px;
+}
+.box p{
+  font-size:20px;
+  color:#00f5ff;
+}
+
 .footer{
-    margin-top:40px;
-    text-align:center;
-    opacity:.6;
+  text-align:center;
+  margin-top:30px;
+  color:#6beeff;
+  font-size:13px;
+}
+
+#status{
+  text-align:center;
+  margin-bottom:20px;
+  font-size:18px;
 }
 </style>
 </head>
+
 <body>
-
-<header>ThreatScope – Cyber Threat Intelligence</header>
-
 <div class="container">
 
-<div class="search-box">
-    <input id="ip" placeholder="Enter IP (eg 8.8.8.8)">
-    <button onclick="scan()">Scan</button>
+<div class="header">
+<h1>ThreatScope</h1>
+<p>Cyber Threat Intelligence Platform</p>
 </div>
 
-<div id="status" style="margin-top:15px"></div>
+<div class="card">
 
-<div class="cards" id="result"></div>
+<div class="input-row">
+<input id="ipInput" placeholder="Enter IP Address (e.g. 8.8.8.8)">
+<button onclick="scanIP()">Scan IP</button>
+</div>
+
+<div id="status">Ready</div>
+
+<div class="grid">
+<div class="box"><h3>Threat Level</h3><p id="threat">--</p></div>
+<div class="box"><h3>Threat Score</h3><p id="score">--</p></div>
+<div class="box"><h3>Abuse Score</h3><p id="abuse">--</p></div>
+<div class="box"><h3>Country</h3><p id="country">--</p></div>
+<div class="box"><h3>ISP</h3><p id="isp">--</p></div>
+<div class="box"><h3>Open Ports</h3><p id="ports">--</p></div>
+<div class="box"><h3>Confidence</h3><p id="confidence">--</p></div>
+</div>
+
+</div>
 
 <div class="footer">
-ThreatScope © 2026 | Cloudflare Workers + VirusTotal + AbuseIPDB + OTX + Shodan
+ThreatScope © 2026 • Powered by Cloudflare Workers, VirusTotal, AbuseIPDB, AlienVault & Shodan
 </div>
 
 </div>
@@ -92,38 +138,28 @@ ThreatScope © 2026 | Cloudflare Workers + VirusTotal + AbuseIPDB + OTX + Shodan
 <script>
 const API = "https://threat-feed-aggregator.hanfinaba.workers.dev";
 
-async function scan(){
-    const ip = document.getElementById("ip").value.trim();
-    if(!ip){ alert("Enter IP"); return; }
+async function scanIP(){
+  const ip = document.getElementById("ipInput").value.trim();
+  if(!ip){ alert("Enter IP"); return; }
 
-    document.getElementById("status").innerText = "Scanning...";
-    document.getElementById("result").innerHTML = "";
+  document.getElementById("status").innerText = "Scanning...";
+  
+  try{
+    const res = await fetch(API + "?ip=" + ip);
+    const data = await res.json();
 
-    try{
-        const r = await fetch(API + "/?ip=" + ip);
-        const data = await r.json();
+    document.getElementById("threat").innerText = data.risk;
+    document.getElementById("score").innerText = data.threat_score;
+    document.getElementById("abuse").innerText = data.feeds.abuseipdb?.abuseConfidenceScore ?? 0;
+    document.getElementById("country").innerText = data.geo.country;
+    document.getElementById("isp").innerText = data.geo.isp;
+    document.getElementById("ports").innerText = (data.feeds.shodan?.open_ports || []).join(", ") || "None";
+    document.getElementById("confidence").innerText = data.confidence;
 
-        if(data.error){
-            document.getElementById("status").innerText = data.error;
-            return;
-        }
-
-        document.getElementById("status").innerText = "Scan completed";
-
-        document.getElementById("result").innerHTML = `
-        <div class="card"><h3>Threat Score</h3>${data.threat_score}</div>
-        <div class="card"><h3>Risk Level</h3>${data.risk}</div>
-        <div class="card"><h3>Confidence</h3>${data.confidence}</div>
-        <div class="card"><h3>Country</h3>${data.geo.country}</div>
-        <div class="card"><h3>ISP</h3>${data.geo.isp}</div>
-        <div class="card"><h3>Open Ports</h3>${data.feeds.shodan?.open_ports?.length || 0}</div>
-        <div class="card"><h3>VirusTotal</h3>${data.feeds.virustotal?.malicious || 0}</div>
-        <div class="card"><h3>AbuseIPDB</h3>${data.feeds.abuseipdb?.abuseConfidenceScore || 0}</div>
-        `;
-
-    }catch(e){
-        document.getElementById("status").innerText="Backend not reachable";
-    }
+    document.getElementById("status").innerText = "Scan Complete";
+  }catch(e){
+    alert("Backend not reachable");
+  }
 }
 </script>
 

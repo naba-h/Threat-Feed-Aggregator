@@ -1,153 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>ThreatScope – Cyber Threat Intelligence</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-<style>
-body {
-  margin:0;
-  font-family:Inter,sans-serif;
-  background:linear-gradient(135deg,#020617,#020617,#020617);
-  color:#e5e7eb;
-}
-header {
-  text-align:center;
-  padding:30px;
-  border-bottom:1px solid #1e293b;
-  background:#020617;
-}
-header h1 {
-  margin:0;
-  color:#38bdf8;
-  font-size:34px;
-}
-header p {
-  margin:6px 0 0;
-  color:#94a3b8;
-}
-.container {
-  max-width:1100px;
-  margin:auto;
-  padding:30px;
-}
-.search {
-  display:flex;
-  gap:12px;
-  margin-bottom:30px;
-}
-.search input {
-  flex:1;
-  padding:14px;
-  border-radius:10px;
-  border:none;
-  background:#020617;
-  color:white;
-  border:1px solid #1e293b;
-  font-size:16px;
-}
-.search button {
-  padding:14px 28px;
-  border:none;
-  border-radius:10px;
-  background:#38bdf8;
-  color:black;
-  font-weight:700;
-  cursor:pointer;
-}
-.cards {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:16px;
-}
-.card {
-  background:#020617;
-  border:1px solid #1e293b;
-  border-radius:14px;
-  padding:20px;
-  text-align:center;
-}
-.card h3 {
-  margin:0 0 10px;
-  color:#38bdf8;
-  font-size:14px;
-  text-transform:uppercase;
-}
-.value {
-  font-size:26px;
-  font-weight:700;
-}
-.low { color:#22c55e }
-.medium { color:#facc15 }
-.high { color:#ef4444 }
-.footer {
-  text-align:center;
-  margin-top:40px;
-  color:#64748b;
-  font-size:14px;
-}
-</style>
-</head>
-
-<body>
-<header>
-<h1>ThreatScope</h1>
-<p>AI-Powered Cyber Threat Intelligence Platform</p>
-</header>
-
-<div class="container">
-
-<div class="search">
-  <input id="ip" placeholder="Enter IP address (8.8.8.8)">
-  <button onclick="scan()">Scan</button>
-</div>
-
-<div class="cards">
-  <div class="card"><h3>Threat Level</h3><div id="risk" class="value">--</div></div>
-  <div class="card"><h3>Threat Score</h3><div id="score" class="value">--</div></div>
-  <div class="card"><h3>Abuse Score</h3><div id="abuse" class="value">--</div></div>
-  <div class="card"><h3>Country</h3><div id="country" class="value">--</div></div>
-  <div class="card"><h3>ISP</h3><div id="isp" class="value">--</div></div>
-  <div class="card"><h3>Open Ports</h3><div id="ports" class="value">--</div></div>
-  <div class="card"><h3>Confidence</h3><div id="confidence" class="value">--</div></div>
-</div>
-
-</div>
-
-<div class="footer">
-ThreatScope © 2026 • Built with Cloudflare Workers, VirusTotal, AbuseIPDB, AlienVault & Shodan
-</div>
-
 <script>
 const API = "https://threat-feed-aggregator.hanfinaba.workers.dev";
 
-async function scan(){
-  const ip = document.getElementById("ip").value;
-  if(!ip) return alert("Enter IP");
+async function scanIP() {
+  const ip = document.getElementById("ipInput").value.trim();
+  if (!ip) {
+    alert("Please enter an IP address");
+    return;
+  }
 
-  document.getElementById("risk").innerText="Scanning…";
+  setLoading(true);
 
-  try{
-    const r = await fetch(API + "?ip=" + ip);
-    const data = await r.json();
+  try {
+    const res = await fetch(`${API}/?ip=${ip}`);
+    const data = await res.json();
 
-    const riskEl = document.getElementById("risk");
-    riskEl.innerText = data.risk;
-    riskEl.className = "value " + data.risk.toLowerCase();
+    if (data.error) {
+      throw new Error(data.error);
+    }
 
-    document.getElementById("score").innerText = data.threat_score ?? 0;
-    document.getElementById("abuse").innerText = data.feeds?.abuseipdb?.abuseConfidenceScore ?? 0;
-    document.getElementById("country").innerText = data.geo?.country ?? "Unknown";
-    document.getElementById("isp").innerText = data.geo?.isp ?? "Unknown";
-    document.getElementById("ports").innerText = data.feeds?.shodan?.open_ports?.length ?? 0;
-    document.getElementById("confidence").innerText = data.confidence ?? "--";
+    document.getElementById("abuse").innerText =
+      data.feeds?.abuseipdb?.abuseConfidenceScore ?? "0";
 
-  } catch {
-    alert("Backend not reachable");
+    document.getElementById("country").innerText =
+      data.geo?.country ?? "Unknown";
+
+    document.getElementById("isp").innerText =
+      data.geo?.isp ?? "Unknown";
+
+    document.getElementById("status").innerText = data.risk;
+    document.getElementById("score").innerText = data.threat_score;
+
+    setLoading(false);
+  } catch (e) {
+    alert("Backend unreachable or error");
+    console.error(e);
+    setLoading(false);
   }
 }
+
+function setLoading(on) {
+  document.getElementById("status").innerText = on ? "Scanning…" : "--";
+  document.getElementById("abuse").innerText = on ? "…" : "--";
+  document.getElementById("country").innerText = on ? "…" : "--";
+  document.getElementById("isp").innerText = on ? "…" : "--";
+  document.getElementById("score").innerText = on ? "…" : "--";
+}
 </script>
-</body>
-</html>

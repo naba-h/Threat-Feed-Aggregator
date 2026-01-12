@@ -1,45 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ThreatScope – Cyber Threat Intelligence</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Inter}
+body{
+background:radial-gradient(circle at top,#0f172a,#020617);
+color:#e5e7eb;
+min-height:100vh;
+display:flex;
+flex-direction:column;
+align-items:center;
+}
+
+header{
+width:100%;
+padding:20px;
+text-align:center;
+background:linear-gradient(90deg,#020617,#0f172a,#020617);
+border-bottom:1px solid #0f766e;
+box-shadow:0 0 20px rgba(0,255,200,.15);
+}
+header h1{
+color:#22d3ee;
+font-size:28px;
+letter-spacing:1px;
+}
+
+.container{
+margin-top:40px;
+width:95%;
+max-width:900px;
+background:#020617;
+padding:30px;
+border-radius:18px;
+box-shadow:0 0 50px rgba(0,255,200,.08);
+border:1px solid #0f766e;
+}
+
+.search-box{
+display:flex;
+gap:12px;
+margin-bottom:30px;
+}
+.search-box input{
+flex:1;
+padding:14px 16px;
+border-radius:12px;
+border:none;
+outline:none;
+font-size:16px;
+background:#020617;
+color:white;
+border:1px solid #0f766e;
+}
+.search-box button{
+padding:14px 28px;
+border:none;
+border-radius:12px;
+background:linear-gradient(135deg,#22d3ee,#14b8a6);
+color:#020617;
+font-weight:700;
+cursor:pointer;
+box-shadow:0 0 15px rgba(34,211,238,.6);
+}
+.search-box button:hover{
+transform:scale(1.05);
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:18px;
+}
+
+.card{
+background:#020617;
+border:1px solid #0f766e;
+border-radius:14px;
+padding:20px;
+text-align:center;
+box-shadow:0 0 15px rgba(34,211,238,.1);
+}
+.card h3{
+color:#22d3ee;
+margin-bottom:10px;
+font-size:14px;
+letter-spacing:1px;
+}
+.card p{
+font-size:22px;
+font-weight:700;
+}
+
+.risk-high{color:#ef4444}
+.risk-medium{color:#facc15}
+.risk-low{color:#22c55e}
+
+footer{
+margin-top:auto;
+padding:20px;
+font-size:13px;
+color:#94a3b8;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>ThreatScope – Cyber Threat Intelligence</h1>
+</header>
+
+<div class="container">
+<div class="search-box">
+<input id="ip" placeholder="Enter IP (eg: 8.8.8.8)">
+<button onclick="scan()">Scan IP</button>
+</div>
+
+<div class="grid">
+<div class="card"><h3>THREAT SCORE</h3><p id="score">--</p></div>
+<div class="card"><h3>RISK LEVEL</h3><p id="risk">--</p></div>
+<div class="card"><h3>ABUSE SCORE</h3><p id="abuse">--</p></div>
+<div class="card"><h3>OPEN PORTS</h3><p id="ports">--</p></div>
+<div class="card"><h3>COUNTRY</h3><p id="country">--</p></div>
+<div class="card"><h3>ISP</h3><p id="isp">--</p></div>
+<div class="card"><h3>CONFIDENCE</h3><p id="confidence">--</p></div>
+</div>
+</div>
+
+<footer>
+ThreatScope © 2026 • Powered by Cloudflare Workers, VirusTotal, AbuseIPDB, AlienVault & Shodan
+</footer>
+
 <script>
-const API = "https://threat-feed-aggregator.hanfibaba.workers.dev";
+const API="https://threat-feed-aggregator.hanfibaba.workers.dev";
 
-async function scanIP() {
-  const ip = document.getElementById("ip").value.trim();
-  if (!ip) return alert("Enter IP");
-
-  setLoading();
-
-  try {
-    const res = await fetch(`${API}/?ip=${ip}`);
-    const data = await res.json();
-
-    if (data.error) throw data.error;
-
-    render(data);
-  } catch (e) {
-    alert("Backend not reachable");
-  }
-}
-
-function setLoading() {
-  set("threat", "Scanning...");
-  set("score", "--");
-  set("abuse", "--");
-  set("country", "--");
-  set("isp", "--");
-  set("ports", "--");
-  set("confidence", "--");
-}
-
-function set(id, val) {
-  document.getElementById(id).innerText = val;
-}
-
-function render(d) {
-  set("threat", d.risk);
-  set("score", d.threat_score);
-  set("abuse", d.feeds.abuseipdb?.abuseConfidenceScore || 0);
-  set("country", d.geo.country);
-  set("isp", d.geo.isp);
-  set("ports", d.feeds.shodan?.open_ports?.join(", ") || "None");
-  set("confidence", d.confidence);
-}
-</script>
+async function scan(){
+const ip=document.getElementById("ip").value.trim();
+if(!ip){alert("Enter IP

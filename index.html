@@ -2,164 +2,159 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ThreatScope – Cyber Threat Intelligence</title>
+<title>ThreatScope | Cyber Threat Intelligence</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Orbitron',sans-serif}
+*{box-sizing:border-box;font-family:Segoe UI,Roboto,sans-serif}
 body{
-  background: radial-gradient(circle at top,#061a2a,#020b14);
-  color:#00eaff;
-  min-height:100vh;
+margin:0;
+background:#050b12;
+color:#00f7ff;
+min-height:100vh;
+}
+header{
+padding:20px;
+text-align:center;
+font-size:28px;
+font-weight:700;
+background:linear-gradient(90deg,#00121c,#002c3a);
+box-shadow:0 0 20px #00f7ff55;
 }
 .container{
-  max-width:1000px;
-  margin:auto;
-  padding:40px 20px;
+max-width:900px;
+margin:auto;
+padding:30px;
 }
-.header{
-  text-align:center;
-  margin-bottom:40px;
-}
-.header h1{
-  font-size:36px;
-  color:#00f5ff;
-  text-shadow:0 0 20px #00f5ff;
-}
-.card{
-  background:rgba(0,15,30,0.9);
-  border:1px solid #00f5ff55;
-  border-radius:15px;
-  padding:30px;
-  box-shadow:0 0 25px #00f5ff33;
-}
-.input-row{
-  display:flex;
-  gap:15px;
-  margin-bottom:30px;
+.search-box{
+display:flex;
+gap:10px;
+margin-bottom:30px;
 }
 input{
-  flex:1;
-  padding:15px;
-  border-radius:10px;
-  border:none;
-  outline:none;
-  background:#02131f;
-  color:#00f5ff;
-  font-size:16px;
+flex:1;
+padding:15px;
+border-radius:10px;
+border:none;
+font-size:18px;
+background:#001a26;
+color:#00f7ff;
+outline:none;
+box-shadow:0 0 10px #00f7ff33;
 }
 button{
-  padding:15px 25px;
-  border:none;
-  border-radius:10px;
-  background:linear-gradient(45deg,#00f5ff,#0066ff);
-  color:black;
-  font-weight:bold;
-  cursor:pointer;
-  box-shadow:0 0 15px #00f5ff;
+padding:15px 30px;
+border:none;
+border-radius:10px;
+background:#00f7ff;
+color:#001a26;
+font-weight:700;
+cursor:pointer;
+transition:0.2s;
 }
-button:hover{opacity:.9}
-
+button:hover{
+background:#0ff;
+box-shadow:0 0 15px #00f7ff;
+}
 .grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:20px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:15px;
 }
-.box{
-  background:#021826;
-  border:1px solid #00f5ff44;
-  border-radius:12px;
-  padding:20px;
-  text-align:center;
-  box-shadow:0 0 10px #00f5ff22;
+.card{
+background:#00121c;
+padding:20px;
+border-radius:15px;
+box-shadow:0 0 15px #00f7ff22;
+text-align:center;
 }
-.box h3{
-  font-size:14px;
-  color:#8befff;
-  margin-bottom:10px;
+.card h3{
+margin:0;
+color:#0ff;
+font-size:14px;
+letter-spacing:1px;
 }
-.box p{
-  font-size:20px;
-  color:#00f5ff;
+.card p{
+font-size:24px;
+margin:10px 0 0;
 }
-
-.footer{
-  text-align:center;
-  margin-top:30px;
-  color:#6beeff;
-  font-size:13px;
+.risk{
+font-size:28px;
+font-weight:800;
 }
-
-#status{
-  text-align:center;
-  margin-bottom:20px;
-  font-size:18px;
+.low{color:#00ff9c}
+.medium{color:#ffd900}
+.high{color:#ff4b4b}
+#error{
+color:#ff4b4b;
+margin-top:15px;
+font-weight:bold;
+}
+footer{
+text-align:center;
+padding:20px;
+color:#00f7ff66;
 }
 </style>
 </head>
 
 <body>
+<header>🛡️ ThreatScope — Cyber Threat Intelligence</header>
+
 <div class="container">
 
-<div class="header">
-<h1>ThreatScope</h1>
-<p>Cyber Threat Intelligence Platform</p>
+<div class="search-box">
+<input id="ip" placeholder="Enter IP address (e.g. 8.8.8.8)">
+<button onclick="scan()">Scan</button>
 </div>
 
-<div class="card">
-
-<div class="input-row">
-<input id="ipInput" placeholder="Enter IP Address (e.g. 8.8.8.8)">
-<button onclick="scanIP()">Scan IP</button>
-</div>
-
-<div id="status">Ready</div>
+<div id="error"></div>
 
 <div class="grid">
-<div class="box"><h3>Threat Level</h3><p id="threat">--</p></div>
-<div class="box"><h3>Threat Score</h3><p id="score">--</p></div>
-<div class="box"><h3>Abuse Score</h3><p id="abuse">--</p></div>
-<div class="box"><h3>Country</h3><p id="country">--</p></div>
-<div class="box"><h3>ISP</h3><p id="isp">--</p></div>
-<div class="box"><h3>Open Ports</h3><p id="ports">--</p></div>
-<div class="box"><h3>Confidence</h3><p id="confidence">--</p></div>
+<div class="card"><h3>Threat Level</h3><p id="risk">--</p></div>
+<div class="card"><h3>Threat Score</h3><p id="score">--</p></div>
+<div class="card"><h3>Abuse Score</h3><p id="abuse">--</p></div>
+<div class="card"><h3>Confidence</h3><p id="confidence">--</p></div>
+<div class="card"><h3>Country</h3><p id="country">--</p></div>
+<div class="card"><h3>ISP</h3><p id="isp">--</p></div>
+<div class="card"><h3>Open Ports</h3><p id="ports">--</p></div>
 </div>
 
 </div>
 
-<div class="footer">
+<footer>
 ThreatScope © 2026 • Powered by Cloudflare Workers, VirusTotal, AbuseIPDB, AlienVault & Shodan
-</div>
-
-</div>
+</footer>
 
 <script>
-const API = "https://threat-feed-aggregator.hanfinaba.workers.dev";
+const API="https://threat-feed-aggregator.hanfinaba.workers.dev";
 
-async function scanIP(){
-  const ip = document.getElementById("ipInput").value.trim();
-  if(!ip){ alert("Enter IP"); return; }
+async function scan(){
+const ip=document.getElementById("ip").value.trim();
+document.getElementById("error").innerText="";
+if(!ip) return;
 
-  document.getElementById("status").innerText = "Scanning...";
-  
-  try{
-    const res = await fetch(API + "?ip=" + ip);
-    const data = await res.json();
+try{
+const res=await fetch(`${API}?ip=${ip}`);
+const data=await res.json();
 
-    document.getElementById("threat").innerText = data.risk;
-    document.getElementById("score").innerText = data.threat_score;
-    document.getElementById("abuse").innerText = data.feeds.abuseipdb?.abuseConfidenceScore ?? 0;
-    document.getElementById("country").innerText = data.geo.country;
-    document.getElementById("isp").innerText = data.geo.isp;
-    document.getElementById("ports").innerText = (data.feeds.shodan?.open_ports || []).join(", ") || "None";
-    document.getElementById("confidence").innerText = data.confidence;
+if(data.error){
+document.getElementById("error").innerText=data.error;
+return;
+}
 
-    document.getElementById("status").innerText = "Scan Complete";
-  }catch(e){
-    alert("Backend not reachable");
-  }
+document.getElementById("risk").innerText=data.risk;
+document.getElementById("risk").className="risk "+data.risk.toLowerCase();
+document.getElementById("score").innerText=data.threat_score;
+document.getElementById("abuse").innerText=data.feeds.abuseipdb;
+document.getElementById("confidence").innerText=data.confidence;
+document.getElementById("country").innerText=data.geo.country;
+document.getElementById("isp").innerText=data.geo.isp;
+document.getElementById("ports").innerText=data.feeds.shodan_ports;
+
+}catch(e){
+document.getElementById("error").innerText="Backend not reachable";
+}
 }
 </script>
 

@@ -122,14 +122,19 @@ async function scan() {
     document.getElementById("status").innerText = "Scanning...";
 
     try {
-        const res = await fetch(API + "?ip=" + ip);
-        const data = await res.json();
+      const res = await fetch(API + "?ip=" + ip);
 
-        if (data.error) {
-            document.getElementById("status").innerText = data.error;
-            return;
-        }
+if (!res.ok) {
+    document.getElementById("status").innerText = "API error: " + res.status;
+    return;
+}
 
+const data = await res.json();
+
+if (data.error) {
+    document.getElementById("status").innerText = data.error;
+    return;
+}
         document.getElementById("status").innerText = "Scan complete";
         document.getElementById("threat").innerText = data.threat_level;
         document.getElementById("score").innerText = data.threat_score;

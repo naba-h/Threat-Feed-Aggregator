@@ -107,7 +107,7 @@ async function scan(){
   if(!ip){ alert("Enter IP address"); return; }
 
   try{
-    const res = await fetch("https://threat-feed-aggregator.hanfibaba.workers.dev/?ip=" + ip);
+    const res = await fetch("https://threat-feed-aggregator.hanfinaba.workers.dev/?ip=" + ip);
     const data = await res.json();
 
     document.getElementById("level").innerText = data.threat_level;

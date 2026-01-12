@@ -1,76 +1,146 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>ThreatScope | Cyber Threat Intelligence</title>
+<meta charset="UTF-8">
+<title>ThreatScope – Cyber Threat Intelligence</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
-body {
-  background:#0b0f19;
-  color:white;
-  font-family:Arial;
-  text-align:center;
+body{
+    margin:0;
+    font-family: "Segoe UI",sans-serif;
+    background: radial-gradient(circle at top, #0f172a, #020617);
+    color:white;
+    min-height:100vh;
 }
-input {
-  width:60%;
-  padding:14px;
-  border-radius:8px;
-  border:none;
-  font-size:16px;
+header{
+    padding:30px;
+    text-align:center;
+    font-size:32px;
+    font-weight:700;
+    letter-spacing:1px;
+    color:#22d3ee;
 }
-button {
-  padding:14px 20px;
-  border:none;
-  background:#00f7ff;
-  color:black;
-  font-size:16px;
-  border-radius:8px;
-  cursor:pointer;
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:20px;
 }
-.card {
-  background:#131b2f;
-  margin:10px;
-  padding:15px;
-  border-radius:10px;
-  display:inline-block;
-  width:250px;
+.search-box{
+    display:flex;
+    gap:15px;
 }
-.risk-low { color:#00ff9c; }
-.risk-medium { color:#ffcc00; }
-.risk-high { color:#ff4b4b; }
+input{
+    flex:1;
+    padding:16px;
+    border:none;
+    outline:none;
+    border-radius:12px;
+    background:#020617;
+    color:white;
+    font-size:18px;
+    box-shadow:0 0 10px rgba(34,211,238,0.2);
+}
+button{
+    padding:16px 28px;
+    border:none;
+    border-radius:12px;
+    background:#22d3ee;
+    color:black;
+    font-weight:700;
+    font-size:16px;
+    cursor:pointer;
+}
+button:hover{ background:#67e8f9 }
+
+.result{
+    margin-top:40px;
+    padding:20px;
+    border-radius:16px;
+    background:rgba(2,6,23,0.8);
+    box-shadow:0 0 25px rgba(34,211,238,.15);
+}
+#verdict{
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:20px;
+}
+.risk-low{color:#4ade80;}
+.risk-medium{color:#facc15;}
+.risk-high{color:#f87171;}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:15px;
+}
+.card{
+    background:#020617;
+    padding:18px;
+    border-radius:12px;
+    box-shadow:0 0 10px rgba(34,211,238,.15);
+    font-size:16px;
+}
+footer{
+    margin-top:40px;
+    text-align:center;
+    font-size:14px;
+    opacity:0.7;
+}
 </style>
 </head>
+
 <body>
 
-<h1>🛡 ThreatScope</h1>
-<p>Cyber Threat Intelligence Platform</p>
+<header>ThreatScope – Cyber Threat Intelligence</header>
 
-<input id="ip" placeholder="Enter IP address"/>
-<button onclick="scan()">Scan</button>
+<div class="container">
+    <div class="search-box">
+        <input id="ip" placeholder="Enter IP address (ex: 8.8.8.8)" />
+        <button onclick="scan()">Scan</button>
+    </div>
 
-<h2 id="verdict"></h2>
+    <div class="result">
+        <div id="verdict">Enter an IP to start analysis</div>
+        <div class="grid" id="cards"></div>
+    </div>
 
-<div id="cards"></div>
+    <footer>
+        Powered by Cloudflare Workers • VirusTotal • AbuseIPDB • OTX • Shodan
+    </footer>
+</div>
 
 <script>
 async function scan(){
-  const ip = document.getElementById("ip").value;
-  const res = await fetch("https://threat-feed-aggregator.hanfinaba.workers.dev/?ip="+ip);
-  const data = await res.json();
+    const ip = document.getElementById("ip").value.trim();
+    if(!ip) return;
 
-  let riskClass = "risk-low";
-  if(data.verdict=="Medium Risk") riskClass="risk-medium";
-  if(data.verdict=="High Risk") riskClass="risk-high";
+    document.getElementById("verdict").innerText = "Scanning " + ip + " …";
+    document.getElementById("cards").innerHTML = "";
 
-  document.getElementById("verdict").innerHTML =
-    `<span class="${riskClass}">${data.verdict}</span> (Confidence ${data.confidence}%)`;
+    try{
+        const res = await fetch("https://threat-feed-aggregator.hanfinaba.workers.dev/?ip=" + ip);
+        const data = await res.json();
 
-  document.getElementById("cards").innerHTML = `
-  <div class="card">🌍 Country: ${data.sources.virustotal.country}</div>
-  <div class="card">🏢 ASN: ${data.sources.virustotal.asn}</div>
-  <div class="card">🧪 VirusTotal: ${data.sources.virustotal.malicious}</div>
-  <div class="card">🚨 AbuseIPDB: ${data.sources.abuseipdb.score}</div>
-  <div class="card">🧠 OTX Pulses: ${data.sources.otx.pulses}</div>
-  <div class="card">🔍 Shodan Ports: ${data.sources.shodan.ports}</div>
-  `;
+        let riskClass = "risk-low";
+        if(data.verdict === "Medium Risk") riskClass = "risk-medium";
+        if(data.verdict === "High Risk") riskClass = "risk-high";
+
+        document.getElementById("verdict").innerHTML =
+            `<span class="${riskClass}">${data.verdict}</span> | Confidence: ${data.confidence}%`;
+
+        document.getElementById("cards").innerHTML = `
+            <div class="card">🌍 Country: ${data.sources.virustotal.country}</div>
+            <div class="card">🏢 ASN: ${data.sources.virustotal.asn}</div>
+            <div class="card">🧪 VirusTotal Malicious: ${data.sources.virustotal.malicious}</div>
+            <div class="card">🚨 AbuseIPDB Score: ${data.sources.abuseipdb.score}</div>
+            <div class="card">🧠 OTX Pulses: ${data.sources.otx.pulses}</div>
+            <div class="card">🔍 Open Ports: ${data.sources.shodan.ports}</div>
+        `;
+    }
+    catch(err){
+        document.getElementById("verdict").innerText = "Backend error or unreachable";
+    }
 }
 </script>
 

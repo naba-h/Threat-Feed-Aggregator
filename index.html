@@ -4,152 +4,125 @@
 <meta charset="UTF-8">
 <title>ThreatScope – Cyber Threat Intelligence</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <style>
-body {
-    margin: 0;
-    font-family: "Segoe UI", system-ui;
-    background: linear-gradient(120deg, #050d18, #081b2e);
-    color: white;
+body{
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
+    background:linear-gradient(120deg,#020b17,#05172d);
+    color:#e6f1ff;
 }
-
-header {
-    padding: 30px;
-    text-align: center;
-    font-size: 28px;
-    color: #00eaff;
-    border-bottom: 1px solid #00eaff44;
-}
-
-.container {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 20px;
-}
-
-.search-box {
-    display: flex;
-    gap: 10px;
-}
-
-input {
-    flex: 1;
-    padding: 15px;
-    font-size: 16px;
-    background: #0b1f33;
-    border: 1px solid #00eaff55;
-    color: white;
-    border-radius: 8px;
-}
-
-button {
-    padding: 15px 25px;
-    background: #00eaff;
-    color: #000;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #00c8d9;
-}
-
-.grid {
-    margin-top: 30px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
-    gap: 20px;
-}
-
-.card {
-    background: #0b1f33;
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px solid #00eaff33;
-}
-
-.label {
-    font-size: 12px;
-    color: #00eaffaa;
-}
-
-.value {
-    font-size: 22px;
-    margin-top: 8px;
-}
-
-.risk-low { color:#00ff9c }
-.risk-medium { color:#ffd000 }
-.risk-high { color:#ff4b4b }
-
-footer {
+header{
     text-align:center;
+    padding:30px;
+    font-size:28px;
+    color:#00f6ff;
+    letter-spacing:2px;
+}
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:20px;
+}
+.search-box{
+    display:flex;
+    gap:10px;
+}
+input{
+    flex:1;
+    padding:14px;
+    border-radius:8px;
+    border:none;
+    outline:none;
+    font-size:16px;
+}
+button{
+    background:#00f6ff;
+    border:none;
+    color:#001;
+    font-weight:bold;
+    padding:14px 22px;
+    border-radius:8px;
+    cursor:pointer;
+}
+button:hover{opacity:.8}
+.cards{
+    margin-top:30px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:15px;
+}
+.card{
+    background:#0b1f38;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 0 20px rgba(0,255,255,.1);
+}
+.card h3{
+    color:#00f6ff;
+    margin-bottom:8px;
+}
+.footer{
     margin-top:40px;
-    color:#00eaff88;
-    font-size:12px;
+    text-align:center;
+    opacity:.6;
 }
 </style>
 </head>
-
 <body>
 
-<header>
-ThreatScope – Cyber Threat Intelligence
-</header>
+<header>ThreatScope – Cyber Threat Intelligence</header>
 
 <div class="container">
-    <div class="search-box">
-        <input id="ip" placeholder="Enter IP address e.g. 8.8.8.8">
-        <button onclick="scan()">Scan</button>
-    </div>
 
-    <div class="grid" id="result">
-        <div class="card"><div class="label">Threat Level</div><div class="value">--</div></div>
-        <div class="card"><div class="label">Threat Score</div><div class="value">--</div></div>
-        <div class="card"><div class="label">Abuse Score</div><div class="value">--</div></div>
-        <div class="card"><div class="label">Country</div><div class="value">--</div></div>
-        <div class="card"><div class="label">ISP</div><div class="value">--</div></div>
-        <div class="card"><div class="label">Open Ports</div><div class="value">--</div></div>
-        <div class="card"><div class="label">Confidence</div><div class="value">--</div></div>
-    </div>
+<div class="search-box">
+    <input id="ip" placeholder="Enter IP (eg 8.8.8.8)">
+    <button onclick="scan()">Scan</button>
 </div>
 
-<footer>
-ThreatScope © 2026 | Powered by Cloudflare Workers, VirusTotal, AbuseIPDB, AlienVault & Shodan
-</footer>
+<div id="status" style="margin-top:15px"></div>
+
+<div class="cards" id="result"></div>
+
+<div class="footer">
+ThreatScope © 2026 | Cloudflare Workers + VirusTotal + AbuseIPDB + OTX + Shodan
+</div>
+
+</div>
 
 <script>
 const API = "https://threat-feed-aggregator.hanfinaba.workers.dev";
 
 async function scan(){
-    const ip = document.getElementById("ip").value;
-    if(!ip) return alert("Enter IP");
+    const ip = document.getElementById("ip").value.trim();
+    if(!ip){ alert("Enter IP"); return; }
+
+    document.getElementById("status").innerText = "Scanning...";
+    document.getElementById("result").innerHTML = "";
 
     try{
-        const res = await fetch(`${API}?ip=${ip}`);
-        const data = await res.json();
+        const r = await fetch(API + "/?ip=" + ip);
+        const data = await r.json();
 
         if(data.error){
-            alert(data.error);
+            document.getElementById("status").innerText = data.error;
             return;
         }
 
-        const cards = document.querySelectorAll(".value");
+        document.getElementById("status").innerText = "Scan completed";
 
-        cards[0].innerText = data.risk;
-        cards[0].className = "value risk-"+data.risk.toLowerCase();
+        document.getElementById("result").innerHTML = `
+        <div class="card"><h3>Threat Score</h3>${data.threat_score}</div>
+        <div class="card"><h3>Risk Level</h3>${data.risk}</div>
+        <div class="card"><h3>Confidence</h3>${data.confidence}</div>
+        <div class="card"><h3>Country</h3>${data.geo.country}</div>
+        <div class="card"><h3>ISP</h3>${data.geo.isp}</div>
+        <div class="card"><h3>Open Ports</h3>${data.feeds.shodan?.open_ports?.length || 0}</div>
+        <div class="card"><h3>VirusTotal</h3>${data.feeds.virustotal?.malicious || 0}</div>
+        <div class="card"><h3>AbuseIPDB</h3>${data.feeds.abuseipdb?.abuseConfidenceScore || 0}</div>
+        `;
 
-        cards[1].innerText = data.threat_score;
-        cards[2].innerText = data.feeds.abuseipdb?.abuseConfidenceScore ?? 0;
-        cards[3].innerText = data.geo.country;
-        cards[4].innerText = data.geo.isp;
-        cards[5].innerText = data.feeds.shodan?.open_ports?.length ?? 0;
-        cards[6].innerText = data.confidence;
-
-    }catch{
-        alert("Backend not reachable");
+    }catch(e){
+        document.getElementById("status").innerText="Backend not reachable";
     }
 }
 </script>

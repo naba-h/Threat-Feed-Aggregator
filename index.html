@@ -1,133 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>ThreatScope | Cyber Threat Intelligence</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<link href="https://fonts.googleapis.com/css2?family=Orbitron&family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
+*{box-sizing:border-box;font-family:Inter,sans-serif}
 body{
-    margin:0;
-    font-family:Inter, sans-serif;
-    background:#050b14;
-    color:#e8f1ff;
+  margin:0;
+  background:radial-gradient(circle at top,#020617,#000);
+  color:#e5e7eb;
 }
 header{
-    background:linear-gradient(90deg,#020b1c,#071b3d);
-    padding:20px;
-    text-align:center;
-    font-family:Orbitron;
-    letter-spacing:2px;
-    font-size:26px;
-    color:#4cc9f0;
-    box-shadow:0 0 20px #4cc9f0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:18px 40px;
+  background:#020617;
+  border-bottom:1px solid #1e293b;
 }
+.logo{
+  font-size:22px;
+  font-weight:700;
+  color:#38bdf8;
+}
+.tag{font-size:12px;color:#94a3b8}
 .container{
-    max-width:1100px;
-    margin:auto;
-    padding:30px;
+  max-width:1200px;
+  margin:auto;
+  padding:40px;
 }
-.card{
-    background:#0b1629;
-    padding:25px;
-    border-radius:12px;
-    box-shadow:0 0 25px rgba(76,201,240,0.15);
-    margin-bottom:25px;
+.hero{
+  text-align:center;
+  margin-bottom:40px;
+}
+.hero h1{
+  font-size:42px;
+  margin-bottom:10px;
+}
+.hero p{
+  color:#94a3b8;
+}
+.search-box{
+  max-width:600px;
+  margin:30px auto;
+  display:flex;
+  gap:10px;
 }
 input{
-    width:100%;
-    padding:14px;
-    border-radius:10px;
-    border:none;
-    font-size:16px;
-    outline:none;
+  flex:1;
+  padding:14px;
+  border-radius:12px;
+  border:none;
+  background:#020617;
+  color:white;
+  font-size:16px;
+  outline:none;
+  border:1px solid #1e293b;
 }
 button{
-    margin-top:15px;
-    padding:14px 25px;
-    border:none;
-    border-radius:10px;
-    background:#4cc9f0;
-    color:#000;
-    font-size:16px;
-    cursor:pointer;
-    box-shadow:0 0 15px #4cc9f0;
+  padding:14px 30px;
+  background:linear-gradient(90deg,#38bdf8,#0ea5e9);
+  border:none;
+  border-radius:12px;
+  font-weight:700;
+  cursor:pointer;
 }
-button:hover{
-    background:#72ddff;
+.card{
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:16px;
+  padding:25px;
+  margin-top:20px;
 }
 .grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-    gap:20px;
-    margin-top:20px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:15px;
 }
 .stat{
-    background:#071b34;
-    padding:20px;
-    border-radius:12px;
-    box-shadow:0 0 20px rgba(0,255,255,0.15);
-    text-align:center;
+  background:#0b1220;
+  padding:20px;
+  border-radius:12px;
+  border:1px solid #1e293b;
+  text-align:center;
 }
-.stat h3{
-    margin:0;
-    font-size:15px;
-    color:#4cc9f0;
+.big{
+  font-size:28px;
+  font-weight:700;
 }
-.stat p{
-    font-size:26px;
-    margin-top:10px;
-}
-footer{
-    text-align:center;
-    padding:15px;
-    color:#aaa;
-    font-size:13px;
+.low{color:#22c55e}
+.medium{color:#facc15}
+.high{color:#ef4444}
+.footer{
+  text-align:center;
+  padding:20px;
+  color:#64748b;
+  border-top:1px solid #1e293b;
 }
 </style>
 </head>
 
 <body>
 
-<header>ThreatScope — Cyber Threat Intelligence</header>
+<header>
+  <div>
+    <div class="logo">ThreatScope</div>
+    <div class="tag">Enterprise Cyber Threat Intelligence</div>
+  </div>
+  <div class="tag">Powered by HanfiNaba SOC Engine</div>
+</header>
 
 <div class="container">
 
-<div class="card">
-<h2>🔍 IP Threat Analyzer</h2>
-<input id="ip" placeholder="Enter IP Address (eg: 8.8.8.8)">
-<button onclick="checkIP()">Scan IP</button>
+<div class="hero">
+<h1>Global Threat Intelligence Platform</h1>
+<p>Analyze IP addresses against VirusTotal, AbuseIPDB, AlienVault & Shodan in real time.</p>
+
+<div class="search-box">
+<input id="ip" placeholder="Enter IP Address (8.8.8.8)">
+<button onclick="scan()">Scan</button>
+</div>
 </div>
 
-<div class="grid">
-<div class="stat"><h3>Abuse Score</h3><p id="abuse">--</p></div>
-<div class="stat"><h3>Threat Status</h3><p id="status">--</p></div>
-<div class="stat"><h3>Country</h3><p id="country">--</p></div>
-<div class="stat"><h3>ISP</h3><p id="isp">--</p></div>
-</div>
+<div id="output"></div>
 
 </div>
 
-<footer>
-ThreatScope © 2026 | Powered by Cloudflare Workers & Threat Intelligence APIs
-</footer>
+<div class="footer">
+ThreatScope © 2026 | Built for Blue Teams & SOC Analysts
+</div>
 
 <script>
-async function checkIP(){
-    let ip = document.getElementById("ip").value
-    if(!ip) return alert("Enter IP")
+async function scan(){
+  const ip=document.getElementById("ip").value;
+  if(!ip)return alert("Enter IP");
+  const out=document.getElementById("output");
+  out.innerHTML="<div class='card'>Scanning threat feeds...</div>";
+  try{
+    const r=await fetch(`https://threat-feed-aggregator.hanfinaba.workers.dev/?ip=${ip}`);
+    const d=await r.json();
+    const riskClass=d.risk.toLowerCase();
 
-    document.getElementById("status").innerText = "Scanning..."
+    out.innerHTML=`
+    <div class="card">
+      <h2>${d.ip}</h2>
+      <p class="big ${riskClass}">${d.risk} Risk</p>
+      <p>Threat Score: ${d.threat_score}/100</p>
+      <p>Confidence: ${d.confidence}</p>
+    </div>
 
-    let res = await fetch("https://threatscope.hanfinaba.workers.dev/check?ip="+ip)
-    let data = await res.json()
+    <div class="card">
+      <h3>Threat Feeds</h3>
+      <div class="grid">
+        <div class="stat"><div>VirusTotal</div><div class="big">${d.feeds.virustotal?.malicious||0}</div></div>
+        <div class="stat"><div>AbuseIPDB</div><div class="big">${d.feeds.abuseipdb?.abuseConfidenceScore||0}%</div></div>
+        <div class="stat"><div>AlienVault</div><div class="big">${d.feeds.alienvault_otx.pulses}</div></div>
+        <div class="stat"><div>Shodan Ports</div><div class="big">${d.feeds.shodan?.open_ports?.length||0}</div></div>
+      </div>
+    </div>
 
-    document.getElementById("abuse").innerText = data.abuseScore ?? "N/A"
-    document.getElementById("status").innerText = data.threat
-    document.getElementById("country").innerText = data.country
-    document.getElementById("isp").innerText = data.isp
+    <div class="card">
+      <h3>Why this IP is risky</h3>
+      ${d.explanation.map(x=>"<p>• "+x+"</p>").join("")}
+    </div>
+    `;
+  }catch{
+    out.innerHTML="<div class='card'>Backend unreachable</div>";
+  }
 }
 </script>
 

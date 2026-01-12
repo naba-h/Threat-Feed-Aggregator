@@ -1,163 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
+<title>ThreatScope</title>
 <meta charset="UTF-8">
-<title>ThreatScope – Cyber Threat Intelligence</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-
 <style>
 body {
-  margin: 0;
-  background: radial-gradient(circle at top, #0b1220, #05070c);
-  color: #e5f3ff;
-  font-family: "Inter", sans-serif;
-}
-
-.app {
-  max-width: 900px;
-  margin: auto;
-  padding: 40px;
-}
-
-h1 {
-  text-align: center;
-  font-size: 42px;
-  color: #00ffe1;
-}
-
-.subtitle {
-  text-align: center;
-  color: #6cc;
-  margin-bottom: 40px;
-}
-
-.search {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-input {
-  width: 60%;
-  padding: 14px;
-  font-size: 18px;
-  background: #0f1b2b;
-  border: 1px solid #00ffe1;
-  color: white;
-  border-radius: 8px;
-  outline: none;
-}
-
-button {
-  background: linear-gradient(135deg, #00ffe1, #00b3ff);
-  border: none;
-  padding: 14px 28px;
-  font-size: 18px;
-  color: #000;
-  font-weight: bold;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-top: 40px;
+  background:#0b1220;
+  font-family:Arial;
+  color:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
 }
 
 .card {
-  background: linear-gradient(180deg, #0f1b2b, #0a111c);
-  border: 1px solid #00ffe155;
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: 0 0 30px #00ffe133;
+  background:#111a2e;
+  padding:30px;
+  border-radius:15px;
+  width:500px;
+  box-shadow:0 0 40px #00f7ff33;
 }
 
-.card h3 {
-  color: #00ffe1;
-  margin-bottom: 10px;
+input {
+  width:100%;
+  padding:12px;
+  background:#0b1220;
+  border:1px solid #00f7ff;
+  color:white;
+  border-radius:8px;
 }
 
-.value {
-  font-size: 28px;
-  font-weight: bold;
+button {
+  margin-top:15px;
+  width:100%;
+  padding:12px;
+  background:#00f7ff;
+  border:none;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
 }
 
-.footer {
-  margin-top: 40px;
-  text-align: center;
-  color: #777;
+.result {
+  margin-top:20px;
+  background:#0b1220;
+  padding:15px;
+  border-radius:10px;
 }
 </style>
 </head>
 
 <body>
-<div class="app">
-  <h1>ThreatScope</h1>
-  <div class="subtitle">Global Cyber Threat Intelligence Engine</div>
 
-  <div class="search">
-    <input id="ipInput" placeholder="Enter IP Address e.g. 8.8.8.8">
-    <button onclick="scanIP()">Analyze</button>
-  </div>
+<div class="card">
+<h2>ThreatScope</h2>
 
-  <div class="grid">
-    <div class="card"><h3>Threat Level</h3><div class="value" id="threatLevel">—</div></div>
-    <div class="card"><h3>Threat Score</h3><div class="value" id="threatScore">—</div></div>
-    <div class="card"><h3>Confidence</h3><div class="value" id="confidence">—</div></div>
-    <div class="card"><h3>Country</h3><div class="value" id="country">—</div></div>
-    <div class="card"><h3>ISP</h3><div class="value" id="isp">—</div></div>
-    <div class="card"><h3>Open Ports</h3><div class="value" id="openPorts">—</div></div>
-  </div>
+<input id="ip" placeholder="Enter IP Address (eg 8.8.8.8)">
+<button onclick="scan()">Analyze</button>
 
-  <div class="footer">
-    Powered by Cloudflare Workers · VirusTotal · AbuseIPDB · AlienVault · Shodan
-  </div>
+<div id="output" class="result">Waiting for scan...</div>
 </div>
 
 <script>
-const API = "https://threat-feed-aggregator.hanfibaba.workers.dev";
+async function scan(){
+  const ip = document.getElementById("ip").value;
+  const out = document.getElementById("output");
 
-async function scanIP() {
-  const ip = document.getElementById("ipInput").value.trim();
-  if (!ip) {
-    alert("Enter an IP");
-    return;
-  }
-
-  setLoading();
+  out.innerText = "Scanning...";
 
   try {
-    const res = await fetch(`${API}/?ip=${ip}`);
+    const res = await fetch(
+      "https://threat-feed-aggregator.hanfibaba.workers.dev/?ip=" + ip
+    );
     const data = await res.json();
 
-    if (data.error) {
-      showError(data.error);
-      return;
-    }
-
-    document.getElementById("threatLevel").innerText = data.verdict;
-    document.getElementById("threatScore").innerText = data.threat_score;
-    document.getElementById("confidence").innerText = data.confidence + "%";
-    document.getElementById("country").innerText = data.sources.virustotal?.country || "—";
-    document.getElementById("isp").innerText = data.sources.shodan?.isp || "—";
-    document.getElementById("openPorts").innerText = data.sources.shodan?.ports?.length || 0;
-
-  } catch (e) {
-    showError("Backend unreachable");
+    out.innerHTML = `
+      IP: ${data.ip}<br>
+      Threat Level: ${data.threatLevel}<br>
+      Threat Score: ${data.threatScore}<br>
+      Abuse Score: ${data.abuseScore}<br>
+      Open Ports: ${data.openPorts}<br>
+      Confidence: ${data.confidence}%
+    `;
+  } catch(e) {
+    out.innerText = "Backend not reachable";
   }
-}
-
-function setLoading() {
-  ["threatLevel","threatScore","confidence","country","isp","openPorts"].forEach(id=>{
-    document.getElementById(id).innerText="...";
-  });
-}
-
-function showError(msg) {
-  document.getElementById("threatLevel").innerText = msg;
 }
 </script>
 
